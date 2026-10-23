@@ -1,16 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../cubit/pengajuan_cubit.dart';
 
-class HalamanDetailLayanan extends StatelessWidget {
-  final Map<String, dynamic>? dataLayanan;
+class HalamanDetailLayanan extends StatefulWidget {
+  final Map<String, String>? dataLayanan;
 
   const HalamanDetailLayanan({super.key, this.dataLayanan});
 
   @override
+  State<HalamanDetailLayanan> createState() => _HalamanDetailLayananState();
+}
+
+class _HalamanDetailLayananState extends State<HalamanDetailLayanan> {
+  bool _sedangMengirim = false;
+
+  void _prosesPengajuan(String nama, Map<String, String> data) async {
+    setState(() {
+      _sedangMengirim = true;
+    });
+
+    // Simulasi proses pengiriman singkat sesaat
+    await Future.delayed(const Duration(milliseconds: 800));
+
+    if (!mounted) return;
+
+    // Tambahkan ke state PengajuanCubit
+    context.read<PengajuanCubit>().tambahPengajuan(data);
+
+    setState(() {
+      _sedangMengirim = false;
+    });
+
+    // Pop dan kirimkan return value ke halaman sebelumnya
+    Navigator.pop(
+      context,
+      'Permohonan "$nama" telah berhasil diajukan.',
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final nama = dataLayanan?['nama'] ?? 'Layanan Tidak Ditemukan';
-    final dinas = dataLayanan?['dinas'] ?? '-';
-    final jam = dataLayanan?['jam'] ?? '-';
-    final keterangan = dataLayanan?['keterangan'] ?? '-';
+    final nama = widget.dataLayanan?['nama'] ?? 'Layanan Tidak Ditemukan';
+    final dinas = widget.dataLayanan?['dinas'] ?? '-';
+    final jam = widget.dataLayanan?['jam'] ?? '-';
+    final keterangan = widget.dataLayanan?['keterangan'] ?? '-';
 
     return Scaffold(
       appBar: AppBar(
@@ -49,17 +82,27 @@ class HalamanDetailLayanan extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                icon: const Icon(Icons.send),
-                label: const Text('Ajukan Permohonan'),
+                icon: _sedangMengirim
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Icon(Icons.send),
+                label: Text(_sedangMengirim ? 'Sedang Mengirim...' : 'Ajukan Permohonan'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
-                onPressed: () { // <--- DI-PERBAIKI: Mengubah onTap menjadi onPressed
-                  Navigator.pop(
-                    context,
-                    'Permohonan "$nama" telah berhasil diajukan.',
-                  );
-                },
+                onPressed: _sedangMengirim
+                    ? null
+                    : () {
+                        if (widget.dataLayanan != null) {
+                          _prosesPengajuan(nama, widget.dataLayanan!);
+                        }
+                      },
               ),
             ),
           ],

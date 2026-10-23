@@ -24,7 +24,7 @@ class AppRoutes {
 
   static Route<dynamic>? bentukRoute(RouteSettings settings) {
     if (settings.name == detailLayanan) {
-      final args = settings.arguments as Map<String, dynamic>?;
+      final args = settings.arguments as Map<String, String>?; 
       return MaterialPageRoute(
         builder: (context) => HalamanDetailLayanan(dataLayanan: args),
       );

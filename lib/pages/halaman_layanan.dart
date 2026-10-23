@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../cubit/favorit_cubit.dart';
 import '../navigation/app_routes.dart';
 
 class HalamanLayanan extends StatelessWidget {
@@ -100,27 +102,42 @@ class HalamanLayanan extends StatelessWidget {
       separatorBuilder: (context, index) => const Divider(height: 1),
       itemBuilder: (context, index) {
         final item = items[index];
-        return ListTile(
-          leading: const Icon(Icons.article_outlined),
-          title: Text(item['nama']!),
-          subtitle: Text(item['dinas']!),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () async {
-            final hasil = await Navigator.pushNamed(
-              context,
-              AppRoutes.detailLayanan,
-              arguments: item,
-            );
+        final nama = item['nama']!;
 
-            if (hasil != null && context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(hasil.toString()),
-                  behavior: SnackBarBehavior.floating,
-                  backgroundColor: Colors.green[700],
+        return BlocBuilder<FavoritCubit, Set<String>>(
+          builder: (context, favoritSet) {
+            final isFavorit = favoritSet.contains(nama);
+
+            return ListTile(
+              leading: IconButton(
+                icon: Icon(
+                  isFavorit ? Icons.star : Icons.star_border,
+                  color: isFavorit ? Colors.amber : null,
                 ),
-              );
-            }
+                onPressed: () {
+                  context.read<FavoritCubit>().toggleFavorit(nama);
+                },
+              ),
+              title: Text(nama),
+              subtitle: Text(item['dinas']!),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () async {
+                final hasil = await Navigator.pushNamed(
+                  context,
+                  AppRoutes.detailLayanan,
+                  arguments: item,
+                );
+                if (hasil != null && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(hasil.toString()),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.green[700],
+                    ),
+                  );
+                }
+              },
+            );
           },
         );
       },

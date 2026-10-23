@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../cubit/pengajuan_cubit.dart';
 import '../pages/halaman_beranda.dart';
 import '../pages/halaman_layanan.dart';
 import '../pages/halaman_warga.dart';
@@ -32,6 +34,20 @@ class _KerangkaNavigasiState extends State<KerangkaNavigasi> {
     });
   }
 
+  Widget _buatIkonWarga({required bool selected}) {
+    final iconBase = Icon(selected ? Icons.person : Icons.person_outline);
+    return BlocSelector<PengajuanCubit, List<Map<String, String>>, int>(
+      selector: (state) => state.length,
+      builder: (context, total) {
+        if (total == 0) return iconBase;
+        return Badge(
+          label: Text('$total'),
+          child: iconBase,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final double lebar = MediaQuery.of(context).size.width;
@@ -52,20 +68,20 @@ class _KerangkaNavigasiState extends State<KerangkaNavigasi> {
     return NavigationBar(
       selectedIndex: _indeksTerpilih,
       onDestinationSelected: _pilihTujuan,
-      destinations: const [
-        NavigationDestination(
+      destinations: [
+        const NavigationDestination(
           icon: Icon(Icons.location_city_outlined),
           selectedIcon: Icon(Icons.location_city),
           label: 'Beranda',
         ),
-        NavigationDestination(
+        const NavigationDestination(
           icon: Icon(Icons.grid_view_outlined),
           selectedIcon: Icon(Icons.grid_view),
           label: 'Layanan',
         ),
         NavigationDestination(
-          icon: Icon(Icons.person_outline),
-          selectedIcon: Icon(Icons.person),
+          icon: _buatIkonWarga(selected: false),
+          selectedIcon: _buatIkonWarga(selected: true),
           label: 'Warga',
         ),
       ],
@@ -83,20 +99,20 @@ class _KerangkaNavigasiState extends State<KerangkaNavigasi> {
             padding: EdgeInsets.symmetric(vertical: 16),
             child: Icon(Icons.apartment, size: 36),
           ),
-          destinations: const [
-            NavigationRailDestination(
+          destinations: [
+            const NavigationRailDestination(
               icon: Icon(Icons.location_city_outlined),
               selectedIcon: Icon(Icons.location_city),
               label: Text('Beranda'),
             ),
-            NavigationRailDestination(
+            const NavigationRailDestination(
               icon: Icon(Icons.grid_view_outlined),
               selectedIcon: Icon(Icons.grid_view),
               label: Text('Layanan'),
             ),
             NavigationRailDestination(
-              icon: Icon(Icons.person_outline),
-              selectedIcon: Icon(Icons.person),
+              icon: _buatIkonWarga(selected: false),
+              selectedIcon: _buatIkonWarga(selected: true),
               label: Text('Warga'),
             ),
           ],
@@ -134,10 +150,10 @@ class _KerangkaNavigasiState extends State<KerangkaNavigasi> {
           selectedIcon: Icon(Icons.grid_view),
           label: Text('Layanan'),
         ),
-        const NavigationDrawerDestination(
-          icon: Icon(Icons.person_outline),
-          selectedIcon: Icon(Icons.person),
-          label: Text('Warga'),
+        NavigationDrawerDestination(
+          icon: _buatIkonWarga(selected: false),
+          selectedIcon: _buatIkonWarga(selected: true),
+          label: const Text('Warga'),
         ),
         const Divider(indent: 28, endIndent: 28),
         Padding(
