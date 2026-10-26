@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/favorit_cubit.dart';
 import '../cubit/pengajuan_cubit.dart';
+import '../cubit/theme_cubit.dart';
 import '../navigation/app_routes.dart';
 
 class HalamanWarga extends StatelessWidget {
@@ -35,6 +36,25 @@ class HalamanWarga extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // ===== SEKSI PENGATURAN TEMA (DARK MODE TOGGLE) =====
+        Card(
+          child: BlocBuilder<ThemeCubit, ThemeMode>(
+            builder: (context, themeMode) {
+              final isDarkMode = themeMode == ThemeMode.dark;
+              return SwitchListTile(
+                title: const Text('Mode Gelap (Dark Theme)'),
+                subtitle: Text(isDarkMode ? 'Mode gelap aktif' : 'Mode terang aktif'),
+                secondary: Icon(isDarkMode ? Icons.dark_mode : Icons.light_mode),
+                value: isDarkMode,
+                onChanged: (_) {
+                  context.read<ThemeCubit>().toggleTheme();
+                },
+              );
+            },
           ),
         ),
         const SizedBox(height: 16),

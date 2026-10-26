@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/pengajuan_cubit.dart';
+import '../cubit/theme_cubit.dart';
 import '../pages/halaman_beranda.dart';
 import '../pages/halaman_layanan.dart';
 import '../pages/halaman_warga.dart';
@@ -57,6 +58,20 @@ class _KerangkaNavigasiState extends State<KerangkaNavigasi> {
       appBar: AppBar(
         title: Text(_judul[_indeksTerpilih]),
         elevation: 2,
+        actions: [
+          BlocBuilder<ThemeCubit, ThemeMode>(
+            builder: (context, themeMode) {
+              final isDark = themeMode == ThemeMode.dark;
+              return IconButton(
+                icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
+                tooltip: isDark ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap',
+                onPressed: () {
+                  context.read<ThemeCubit>().toggleTheme();
+                },
+              );
+            },
+          ),
+        ],
       ),
       drawer: _buatDrawer(),
       body: layarLebar ? _tataLetakLebar() : _halaman[_indeksTerpilih],
